@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stomach Cancer Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background: #f9f9f9;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .quiz-container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 32px 24px;
+    }
+    h1 {
+      color: #2E8B57;
+      text-align: center;
+      margin-bottom: 0.5em;
+    }
+    .question {
+      font-size: 1.15em;
+      margin-bottom: 1em;
+      color: #333;
+    }
+    .options {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 1em;
+    }
+    .options li {
+      margin-bottom: 0.5em;
+    }
+    .options input[type="radio"] {
+      margin-right: 0.6em;
+    }
+    .btn {
+      display: inline-block;
+      background: #2E8B57;
+      color: #fff;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #226644;
+    }
+    .feedback {
+      font-weight: bold;
+      margin-top: 1em;
+      min-height: 1.5em;
+    }
+    .correct {
+      color: #218838;
+    }
+    .incorrect {
+      color: #c0392b;
+    }
+    .score {
+      text-align: center;
+      font-size: 1.25em;
+      margin-top: 1.5em;
+      color: #2E8B57;
+    }
+    @media (max-width: 600px) {
+      .quiz-container {
+        padding: 16px 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>🩺 Stomach Cancer Quiz 🩺</h1>
+    <div id="quiz">
+      <!-- Quiz will be injected here -->
+    </div>
+    <div class="score" id="score"></div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "What is another name for stomach cancer?",
+        options: [
+          "Gastric cancer",
+          "Colon cancer",
+          "Pancreatic cancer",
+          "Liver cancer"
+        ],
+        answer: 0
+      },
+      {
+        question: "Which type of stomach cancer is most common?",
+        options: [
+          "Lymphoma",
+          "Adenocarcinoma",
+          "GIST",
+          "Neuroendocrine tumor"
+        ],
+        answer: 1
+      },
+      {
+        question: "What is a major risk factor for stomach cancer that has decreased in recent years?",
+        options: [
+          "Refrigerator use",
+          "H. pylori infection",
+          "Eating fresh fruits",
+          "Taking antioxidants"
+        ],
+        answer: 1
+      },
+      {
+        question: "Which age group is most commonly diagnosed with stomach cancer?",
+        options: [
+          "Children under 10",
+          "Teens",
+          "Adults over 65",
+          "Adults 20-30"
+        ],
+        answer: 2
+      },
+      {
+        question: "Which of the following is a sign that stomach cancer rates are improving in the US?",
+        options: [
+          "Rates are increasing every year",
+          "Rates are staying the same",
+          "Rates are dropping by about 1.5% each year",
+          "Stomach cancer is the most common cancer"
+        ],
+        answer: 2
+      },
+      {
+        question: "Which of these is a new approach in stomach cancer treatment?",
+        options: [
+          "Targeted therapy and immunotherapy",
+          "Only surgery",
+          "Only radiation",
+          "No treatment"
+        ],
+        answer: 0
+      },
+      {
+        question: "What is the average age at diagnosis for stomach cancer?",
+        options: [
+          "25",
+          "45",
+          "68",
+          "80"
+        ],
+        answer: 2
+      },
+      {
+        question: "Which food storage method is linked to lower stomach cancer risk?",
+        options: [
+          "Salting and smoking",
+          "Refrigeration",
+          "Canning",
+          "Sun drying"
+        ],
+        answer: 1
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const quizEl = document.getElementById('quiz');
+    const scoreEl = document.getElementById('score');
+
+    function showQuestion() {
+      if (currentQuestion < quizData.length) {
+        const q = quizData[currentQuestion];
+        let html = `
+          <div class="question"><span style="font-size:1.2em;">Q${currentQuestion + 1}:</span> ${q.question}</div>
+          <ul class="options">
+        `;
+        q.options.forEach((opt, idx) => {
+          html += `
+            <li>
+              <label>
+                <input type="radio" name="option" value="${idx}">
+                ${opt}
+              </label>
+            </li>
+          `;
+        });
+        html += `</ul>
+          <button class="btn" id="submitBtn">Submit</button>
+          <div class="feedback" id="feedback"></div>
+        `;
+        quizEl.innerHTML = html;
+        document.getElementById('submitBtn').onclick = validateAnswer;
+      } else {
+        showFinalScore();
+      }
+    }
+
+    function validateAnswer() {
+      const options = document.getElementsByName('option');
+      let selected = -1;
+      for (let i = 0; i < options.length; i++) {
+        if (options[i].checked) {
+          selected = parseInt(options[i].value);
+          break;
+        }
+      }
+      const feedbackEl = document.getElementById('feedback');
+      if (selected === -1) {
+        feedbackEl.textContent = "Please select an answer!";
+        feedbackEl.className = "feedback incorrect";
+        return;
+      }
+      const correct = quizData[currentQuestion].answer;
+      if (selected === correct) {
+        feedbackEl.textContent = "✅ Correct!";
+        feedbackEl.className = "feedback correct";
+        score++;
+      } else {
+        feedbackEl.textContent = `❌ Incorrect. The correct answer is: "${quizData[currentQuestion].options[correct]}".`;
+        feedbackEl.className = "feedback incorrect";
+      }
+      // Disable options after answering
+      const optionInputs = document.getElementsByName('option');
+      optionInputs.forEach(opt => opt.disabled = true);
+      // Change button to "Next"
+      const btn = document.getElementById('submitBtn');
+      btn.textContent = (currentQuestion < quizData.length - 1) ? "Next" : "See Results";
+      btn.onclick = () => {
+        currentQuestion++;
+        showQuestion();
+      };
+    }
+
+    function showFinalScore() {
+      quizEl.innerHTML = `<div style="font-size:1.3em; text-align:center; margin-top:1em;">
+        🎉 Quiz Complete! 🎉<br>
+        You scored <strong>${score}</strong> out of <strong>${quizData.length}</strong>.<br>
+        <span style="font-size:1.1em; color:#2E8B57;">${getScoreMessage(score, quizData.length)}</span>
+      </div>
+      <button class="btn" style="display:block; margin: 24px auto 0 auto;" onclick="location.reload()">Try Again</button>
+      `;
+      scoreEl.textContent = "";
+    }
+
+    function getScoreMessage(score, total) {
+      if (score === total) return "Perfect! You're a stomach cancer superstar! 🌟";
+      if (score >= total - 2) return "Great job! You know your stuff! 👍";
+      if (score >= total / 2) return "Nice effort! Keep learning and stay curious!";
+      return "Don't worry! Review the info and try again!";
+    }
+
+    // Start the quiz
+    showQuestion();
+  </script>
+</body>
+</html>
